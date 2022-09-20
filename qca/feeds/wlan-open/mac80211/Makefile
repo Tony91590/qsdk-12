@@ -3,21 +3,12 @@ include $(INCLUDE_DIR)/kernel.mk
 
 
 PKG_NAME:=mac80211
-
-PKG_BACKPORTS_VERSION:=3a9d70a32ea5
-PKG_BACKPORTS_SOURCE_URL:=git://git.kernel.org/pub/scm/linux/kernel/git/backports/backports.git
-PKG_BACKPORTS_BRANCH:=master
-
-PKG_KERNEL_VERSION:=b157d2276
-PKG_KERNEL_SOURCE_URL:=https://source.codeaurora.org/quic/qsdk/kvalo/ath.git
-PKG_KERNEL_BRANCH:=ath-qca
-
-PKG_VERSION:=20210222_001
-PKG_SOURCE:=backports-$(PKG_VERSION)-$(LINUX_VERSION)-$(PKG_KERNEL_VERSION).tar.bz2
-PKG_SUBDIR:=backports-$(PKG_VERSION)-$(LINUX_VERSION)-$(PKG_KERNEL_VERSION)
+PKG_VERSION:=20210222_001-4.4.60-b157d2276
 PKG_RELEASE:=1
-
-PKG_BUILD_DIR:=$(KERNEL_BUILD_DIR)/$(PKG_SUBDIR)
+PKG_SOURCE_URL:=https://mirror2.openwrt.org/sources/
+PKG_HASH:=a9edb1063cc9901c409e6eb79bed97ab88c664f06caa88c988e9b21731623f7a
+PKG_SOURCE:=backports-$(PKG_VERSION).tar.bz2
+PKG_BUILD_DIR:=$(KERNEL_BUILD_DIR)/backports-$(PKG_VERSION)
 PKG_BUILD_PARALLEL:=1
 
 PKG_DRIVERS = ath9k-common ath9k ath9k-htc ath10k ath11k ath
