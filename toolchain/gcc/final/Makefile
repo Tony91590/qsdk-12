@@ -11,7 +11,7 @@ GCC_CONFIGURE += \
 	--with-slibdir=$(TOOLCHAIN_DIR)/lib \
 	--enable-lto \
 	--with-libelf=$(TOPDIR)/staging_dir/host \
-        --disable-werror
+        --disable-werror \
         --Wno-unused-variable
 
 ifdef CONFIG_USE_MUSL
