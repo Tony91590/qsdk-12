@@ -398,8 +398,7 @@ endif
 
 ifneq "$(NSS_DRV_CRYPTO_ENABLE)" "n"
 ccflags-y += -DNSS_DRV_CRYPTO_ENABLE
-ccflags-y += -DNSS_DRV_DMA_ENABLE
-ccflags-y += --disable-werror 
+ccflags-y += -DNSS_DRV_DMA_ENABLE 
 
 qca-nss-drv-objs += \
 		    nss_crypto_cmn.o \
