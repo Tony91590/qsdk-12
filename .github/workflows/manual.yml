@@ -81,7 +81,7 @@ jobs:
           CONFIG_KERNEL_IPQ_MEM_PROFILE=512
           CONFIG_TARGET_ipq807x_generic_QSDK_512=y
           CONFIG_LINUX_5_4=y
-          CONFIG_GCC_VERSION="7.5.0"
+          CONFIG_GCC_VERSION="8.3.0"
           CONFIG_DEFAULT_aq-fw-download=y
           CONFIG_TARGET_SUBTARGET="generic"
           CONFIG_TARGET_PROFILE="QSDK_512"
