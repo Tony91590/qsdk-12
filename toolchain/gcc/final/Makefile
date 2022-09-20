@@ -10,7 +10,7 @@ GCC_CONFIGURE += \
 	--enable-threads \
 	--with-slibdir=$(TOOLCHAIN_DIR)/lib \
 	--enable-lto \
-	--with-libelf=$(TOPDIR)/staging_dir/host
+	--with-libelf=$(TOPDIR)/staging_dir/host \
         --disable-werror
 
 ifdef CONFIG_USE_MUSL
