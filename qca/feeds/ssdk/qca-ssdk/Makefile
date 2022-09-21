@@ -1,52 +1,98 @@
-
 include $(TOPDIR)/rules.mk
-include $(INCLUDE_DIR)/kernel.mk
 
-PKG_NAME:=qca-ssdk-shell
-PKG_SOURCE_PROTO:=git
-PKG_BRANCH:=master
+PKG_NAME:=qca-ssdk
 PKG_RELEASE:=1
-PKG_SOURCE_URL:=https://git.codelinaro.org/clo/qsdk/oss/ssdk-shell
-PKG_MIRROR_HASH:=b9274a939e3dc47acb489cb475205c49dc79dbda5c6dfbd65d3940fa13786c80
-PKG_VERSION:=9452cc86eee3730eac5f48e45800c3a9717e313b
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=$(PKG_VERSION)
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_DATE:=2021-12-07
+PKG_SOURCE_URL:=https://source.codeaurora.org/quic/qsdk/oss/lklm/qca-ssdk
+PKG_SOURCE_VERSION:=e7dcdd63724170465072f03ab04eab9d40b98954
+PKG_MIRROR_HASH:=8f0f33fd09821a09ef27d7e145596d80d20fb8a1d0766b9f8d7b517762daed27
 
+include $(INCLUDE_DIR)/kernel.mk
 include $(INCLUDE_DIR)/package.mk
 
-define Package/qca-ssdk-shell
-  SECTION:=QCA
-  CATEGORY:=Utilities
-  TITLE:=Shell application for QCA SSDK
+define KernelPackage/qca-ssdk
+  SECTION:=kernel
+  CATEGORY:=Kernel modules
+  SUBMENU:=Network Devices
+  TITLE:=Kernel driver for QCA SSDK
+  FILES:=$(PKG_BUILD_DIR)/build/bin/qca-ssdk.ko
+  AUTOLOAD:=$(call AutoLoad,30,qca-ssdk)
+  PROVIDES:=qca-ssdk
 endef
 
-
-define Package/qca-ssdk-shell/Description
-  This package contains a qca-ssdk shell application for QCA chipset
+define KernelPackage/qca-ssdk/Description
+This package contains a qca-ssdk driver for QCA chipset
 endef
 
-ifndef CONFIG_TOOLCHAIN_BIN_PATH
-CONFIG_TOOLCHAIN_BIN_PATH=$(TOOLCHAIN_DIR)/bin
+GCC_VERSION=$(shell echo "$(CONFIG_GCC_VERSION)" | sed 's/[^0-9.]*\([0-9.]*\).*/\1/')
+
+TOOLCHAIN_BIN_PATH=$(TOOLCHAIN_DIR)/bin
+
+QCASSDK_CONFIG_OPTS+= \
+	$(KERNEL_MAKE_FLAGS) \
+	KVER=$(LINUX_VERSION) \
+	SYS_PATH=$(LINUX_DIR) \
+	GCC_VERSION=$(GCC_VERSION) \
+	TOOLPREFIX=$(TARGET_CROSS) \
+	TOOL_PATH=$(TOOLCHAIN_BIN_PATH) \
+	TARGET_SUFFIX=$(CONFIG_TARGET_SUFFIX) \
+	EXTRA_CFLAGS=-I$(STAGING_DIR)/usr/include
+
+ifeq ($(BOARD),ipq50xx)
+    QCASSDK_CONFIG_OPTS+= ISISC_ENABLE=enable
+    QCASSDK_CONFIG_OPTS+= CHIP_TYPE=MP
+else ifeq ($(BOARD),ipq60xx)
+    QCASSDK_CONFIG_OPTS+= CHIP_TYPE=CPPE
+    QCASSDK_CONFIG_OPTS+= PTP_FEATURE=enable
+else ifeq ($(BOARD),ipq807x)
+    QCASSDK_CONFIG_OPTS+= CHIP_TYPE=HPPE
+    QCASSDK_CONFIG_OPTS+= PTP_FEATURE=enable
+else ifeq ($(BOARD),ipq95xx)
+    QCASSDK_CONFIG_OPTS+= CHIP_TYPE=APPE
+else
+    QCASSDK_CONFIG_OPTS+= HK_CHIP=enable
 endif
 
-QCASSDK_CONFIG_OPTS+= TOOL_PATH=$(CONFIG_TOOLCHAIN_BIN_PATH) \
-                SYS_PATH=$(LINUX_DIR) \
-                TOOLPREFIX=$(TARGET_CROSS) \
-                KVER=$(LINUX_VERSION) \
-                CFLAGS="$(TARGET_CFLAGS)" \
-                LDFLAGS="$(TARGET_LDFLAGS)" \
-                ARCH=$(LINUX_KARCH)
+ifneq (, $(findstring $(CONFIG_KERNEL_IPQ_MEM_PROFILE), 256 512))
+    QCASSDK_CONFIG_OPTS+= MINI_SSDK=enable
+    QCASSDK_CONFIG_OPTS+= PTP_FEATURE=disable
+endif
 
 define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR) $(strip $(QCASSDK_CONFIG_OPTS))
 endef
 
-define Package/qca-ssdk-shell/install
-	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/build/bin/ssdk_sh $(1)/usr/sbin/
+define Build/InstallDev
+	$(INSTALL_DIR) $(1)/usr/include/qca-ssdk
+	$(INSTALL_DIR) $(1)/usr/include/qca-ssdk/api
+	$(INSTALL_DIR) $(1)/usr/include/qca-ssdk/ref
+	$(INSTALL_DIR) $(1)/usr/include/qca-ssdk/fal
+	$(INSTALL_DIR) $(1)/usr/include/qca-ssdk/sal
+	$(INSTALL_DIR) $(1)/usr/include/qca-ssdk/init
+	$(CP) -rf $(PKG_BUILD_DIR)/include/api/sw_ioctl.h $(1)/usr/include/qca-ssdk/api
+	if [ -f $(PKG_BUILD_DIR)/include/ref/ref_vsi.h ]; then \
+	$(CP) -rf $(PKG_BUILD_DIR)/include/ref/ref_vsi.h $(1)/usr/include/qca-ssdk/ref/; \
+	fi
+	if [ -f $(PKG_BUILD_DIR)/include/ref/ref_fdb.h ]; then \
+	$(CP) -rf $(PKG_BUILD_DIR)/include/ref/ref_fdb.h $(1)/usr/include/qca-ssdk/ref/; \
+	fi
+	if [ -f $(PKG_BUILD_DIR)/include/ref/ref_port_ctrl.h ]; then \
+	$(CP) -rf $(PKG_BUILD_DIR)/include/ref/ref_port_ctrl.h $(1)/usr/include/qca-ssdk/ref/; \
+	fi
+	if [ -f $(PKG_BUILD_DIR)/include/init/ssdk_init.h ]; then \
+	$(CP) -rf $(PKG_BUILD_DIR)/include/init/ssdk_init.h $(1)/usr/include/qca-ssdk/init/; \
+	fi
+	$(CP) -rf $(PKG_BUILD_DIR)/include/fal $(1)/usr/include/qca-ssdk
+	$(CP) -rf $(PKG_BUILD_DIR)/include/common/*.h $(1)/usr/include/qca-ssdk
+	$(CP) -rf $(PKG_BUILD_DIR)/include/sal/os/linux/*.h $(1)/usr/include/qca-ssdk
+	$(CP) -rf $(PKG_BUILD_DIR)/include/sal/os/*.h $(1)/usr/include/qca-ssdk
 endef
 
+define KernelPackage/qca-ssdk/install
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/qca-ssdk $(1)/etc/init.d/qca-ssdk
+endef
 
-$(eval $(call BuildPackage,qca-ssdk-shell))
+$(eval $(call KernelPackage,qca-ssdk))
