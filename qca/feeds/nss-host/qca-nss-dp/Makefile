@@ -1,18 +1,15 @@
 include $(TOPDIR)/rules.mk
-include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=qca-nss-dp
-PKG_SOURCE_PROTO:=git
-PKG_BRANCH:=master
 PKG_RELEASE:=1
-PKG_SOURCE_URL:=https://git.codelinaro.org/clo/qsdk/oss/lklm/nss-dp
-PKG_MIRROR_HASH:=dc5e870bf781d052399e8bbc0aa3d6593abeeff29304b64c685584f09fd29519
-PKG_VERSION:=480f036cc96d4e5faa426cfcf90fa7e64dff87e8
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=$(PKG_VERSION)
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_DATE:=2021-03-26
+PKG_SOURCE_URL:=https://source.codeaurora.org/quic/qsdk/oss/lklm/nss-dp
+PKG_SOURCE_VERSION:=e0c89348d5ad99559ce2fbe15d37b3b5bc66aa03
+PKG_MIRROR_HASH:=f369f0c3b33b5f4ad6d0a6ad6ac5495f63c9ecaf94e4e7fa345169f3e44fcf45
 
+include $(INCLUDE_DIR)/kernel.mk
 include $(INCLUDE_DIR)/package.mk
 
 define KernelPackage/qca-nss-dp
@@ -37,22 +34,20 @@ endef
 EXTRA_CFLAGS+= \
 	-I$(STAGING_DIR)/usr/include/qca-ssdk
 
-subtarget:=$(SUBTARGET)
-
 NSS_DP_HAL_DIR:=$(PKG_BUILD_DIR)/hal
-hal_arch:=$(subtarget)
 
 define Build/Configure
-	$(LN) $(NSS_DP_HAL_DIR)/soc_ops/$(hal_arch)/nss_$(hal_arch).h \
+	$(LN) $(NSS_DP_HAL_DIR)/arch/$(BOARD)/nss_$(BOARD).h \
 		$(PKG_BUILD_DIR)/exports/nss_dp_arch.h
 endef
 
 define Build/Compile
 	$(MAKE) -C "$(LINUX_DIR)" \
 		CROSS_COMPILE="$(TARGET_CROSS)" \
-		ARCH="$(LINUX_KARCH)" \
+		EXTRA_CFLAGS="$(EXTRA_CFLAGS)" \
+		$(KERNEL_MAKE_FLAGS) \
 		M="$(PKG_BUILD_DIR)" \
-		EXTRA_CFLAGS="$(EXTRA_CFLAGS)" SoC=""$(subtarget)"" \
+		SoC="$(BOARD)_64" \
 		modules
 endef
 
