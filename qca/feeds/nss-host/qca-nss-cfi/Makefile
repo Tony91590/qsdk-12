@@ -111,7 +111,7 @@ define Build/Compile
 		CFI_CRYPTOAPI_DIR=$(CFI_CRYPTOAPI_DIR) \
 		CFI_OCF_DIR=$(CFI_OCF_DIR) \
 		CFI_IPSEC_DIR=$(CFI_IPSEC_DIR) \
-		SoC=$(subtarget) \
+		SoC=$(BOARD)_64 \
 		modules
 endef
 
