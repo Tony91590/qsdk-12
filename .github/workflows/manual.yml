@@ -12,7 +12,7 @@ name: OpenWrt-CI
 on:
   push:
     branches: 
-      - master
+      - Bb
 
   # schedule:
   #   - cron: 0 20 * * *
@@ -34,7 +34,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: master
+          ref: Bb
 
       - name: Space cleanup
         env:
