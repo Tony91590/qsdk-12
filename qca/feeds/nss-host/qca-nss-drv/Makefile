@@ -9,6 +9,8 @@ PKG_SOURCE_URL:=https://source.codeaurora.org/quic/qsdk/oss/lklm/nss-drv
 PKG_SOURCE_VERSION:=5d47e4261bae9bc343ce50402011ee64729684f9
 PKG_MIRROR_HASH:=832a6f3af2d37f3e38231a3df41d5d7d9c7abc4975c0445f962146e8950a9433
 
+NSS_CLIENTS_DIR:=$(TOPDIR)/qca/src/qca-nss-clients
+
 include $(INCLUDE_DIR)/kernel.mk
 include $(INCLUDE_DIR)/package.mk
 
