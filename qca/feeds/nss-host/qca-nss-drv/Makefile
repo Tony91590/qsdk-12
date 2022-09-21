@@ -56,7 +56,6 @@ endef
 EXTRA_CFLAGS+= -Wno-unused-variable \
 	-I$(STAGING_DIR)/usr/include/qca-nss-dp \
 	-I$(STAGING_DIR)/usr/include/qca-ssdk
-        -I$(STAGING_DIR)/usr/include/qca-nss-gmac
 
 ifeq ($(CONFIG_KERNEL_IPQ_MEM_PROFILE),256)
 EXTRA_CFLAGS+= -DNSS_MEM_PROFILE_LOW
