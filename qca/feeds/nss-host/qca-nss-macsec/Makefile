@@ -57,7 +57,7 @@ define Build/Compile
 		CROSS_COMPILE="$(TARGET_CROSS)" \
 		ARCH="$(LINUX_KARCH)" \
 		M="$(PKG_BUILD_DIR)" \
-		SoC="$(subtarget)" \
+		SoC="$(BOARD)_64" \
 		modules
 	$(MAKE) -C $(PKG_BUILD_DIR) $(strip $(QCA_NSS_MACSEC_CONFIG_OPTS)) -f Makefile.shell
 endef
