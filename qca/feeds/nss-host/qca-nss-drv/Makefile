@@ -1,21 +1,15 @@
 include $(TOPDIR)/rules.mk
-include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=qca-nss-drv
+PKG_RELEASE:=1
+
 PKG_SOURCE_PROTO:=git
-PKG_BRANCH:=master
-PKG_RELEASE:=2
-PKG_SOURCE_URL:=https://git.codelinaro.org/clo/qsdk/oss/lklm/nss-drv
-PKG_MIRROR_HASH:=350af8f6b1f06ea0871314783a5362483963bbe327ba774ba49a2a775847363e
-PKG_VERSION:=7563fe37340ec4a28b7821a0ac17608ff30e2a85
+PKG_SOURCE_DATE:=2021-11-12
+PKG_SOURCE_URL:=https://source.codeaurora.org/quic/qsdk/oss/lklm/nss-drv
+PKG_SOURCE_VERSION:=5d47e4261bae9bc343ce50402011ee64729684f9
+PKG_MIRROR_HASH:=832a6f3af2d37f3e38231a3df41d5d7d9c7abc4975c0445f962146e8950a9433
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=$(PKG_VERSION)
-
-
-NSS_CLIENTS_DIR:=$(TOPDIR)/qca/src/qca-nss-clients
-
+include $(INCLUDE_DIR)/kernel.mk
 include $(INCLUDE_DIR)/package.mk
 
 define KernelPackage/qca-nss-drv
@@ -38,7 +32,6 @@ define KernelPackage/qca-nss-drv/install
 	$(INSTALL_BIN) ./files/qca-nss-drv.init $(1)/etc/init.d/qca-nss-drv
 	$(INSTALL_BIN) ./files/qca-nss-drv.sysctl $(1)/etc/sysctl.d/qca-nss-drv.conf
 	$(INSTALL_BIN) ./files/qca-nss-drv.conf $(1)/etc/config/nss
-
 endef
 
 define KernelPackage/qca-nss-drv/Description
@@ -48,17 +41,11 @@ endef
 define Build/InstallDev
 	mkdir -p $(1)/usr/include/qca-nss-drv
 	$(CP) $(PKG_BUILD_DIR)/exports/* $(1)/usr/include/qca-nss-drv/
-ifneq (, $(findstring $(subtarget), "ipq807x" "ipq807x_64" "ipq60xx" "ipq60xx_64" "ipq50xx" "ipq50xx_64"))
-	$(RM) $(1)/usr/include/qca-nss-drv/nss_ipsecmgr.h
-	$(INSTALL_DIR) $(1)/usr/include/qca-nss-clients
-#	$(CP) $(NSS_CLIENTS_DIR)/exports/nss_ipsecmgr.h $(1)/usr/include/qca-nss-clients/.
-endif
 endef
 
-EXTRA_CFLAGS+= -I$(STAGING_DIR)/usr/include/qca-nss-gmac -I$(STAGING_DIR)/usr/include/qca-nss-dp -I$(STAGING_DIR)/usr/include/qca-ssdk
-
-# Keeping default as ipq806x for branches that does not have subtarget framework
-subtarget:=$(SUBTARGET)
+EXTRA_CFLAGS+= -Wno-unused-variable \
+	-I$(STAGING_DIR)/usr/include/qca-nss-dp \
+	-I$(STAGING_DIR)/usr/include/qca-ssdk
 
 ifeq ($(CONFIG_KERNEL_IPQ_MEM_PROFILE),256)
 EXTRA_CFLAGS+= -DNSS_MEM_PROFILE_LOW
@@ -74,7 +61,8 @@ endif
 
 DRV_MAKE_OPTS:=
 ifeq ($(CONFIG_KERNEL_IPQ_MEM_PROFILE),256)
-DRV_MAKE_OPTS+=NSS_DRV_C2C_ENABLE=n \
+DRV_MAKE_OPTS+= \
+        NSS_DRV_C2C_ENABLE=n \
         NSS_DRV_CAPWAP_ENABLE=n \
         NSS_DRV_CLMAP_ENABLE=n \
         NSS_DRV_CRYPTO_ENABLE=n \
@@ -105,16 +93,16 @@ DRV_MAKE_OPTS+=NSS_DRV_C2C_ENABLE=n \
 endif
 
 define Build/Configure
-	$(LN) arch/nss_$(subtarget).h $(PKG_BUILD_DIR)/exports/nss_arch.h
+	$(LN) arch/nss_$(BOARD)_64.h $(PKG_BUILD_DIR)/exports/nss_arch.h
 endef
 
 define Build/Compile
 	$(MAKE) -C "$(LINUX_DIR)" $(strip $(DRV_MAKE_OPTS)) \
 		CROSS_COMPILE="$(TARGET_CROSS)" \
-		ARCH="$(LINUX_KARCH)" \
+		EXTRA_CFLAGS="$(EXTRA_CFLAGS)" \
+		$(KERNEL_MAKE_FLAGS) \
 		M="$(PKG_BUILD_DIR)" \
-		EXTRA_CFLAGS="$(EXTRA_CFLAGS)" SoC="$(subtarget)" \
-		KBUILD_MODPOST_WARN=1 \
+		SoC="$(BOARD)_64" \
 		modules
 endef
 
