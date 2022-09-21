@@ -1,25 +1,24 @@
 
 include $(TOPDIR)/rules.mk
-include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=qca-ssdk-shell
-PKG_SOURCE_PROTO:=git
-PKG_BRANCH:=master
 PKG_RELEASE:=1
 
-include $(INCLUDE_DIR)/local-development.mk
-ifeq ($(DUMP)$(PKG_VERSION),)
-  PKG_VERSION:=$(shell git ls-remote $(PKG_SOURCE_URL) $(PKG_BRANCH) | cut -b -7)
-endif
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_DATE:=2021-12-01
+PKG_SOURCE_URL:=https://source.codeaurora.org/quic/qsdk/oss/ssdk-shell
+PKG_SOURCE_VERSION:=c443bebf58de61a148b35d307bf331bb349f9b8b
+PKG_MIRROR_HASH:=b48291620a90b1cfec949447bb2225da8a35fe48338412f1c50af43d9656c7c8
 
+include $(INCLUDE_DIR)/kernel.mk
 include $(INCLUDE_DIR)/package.mk
 
 define Package/qca-ssdk-shell
-  SECTION:=QCA
+  SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=Shell application for QCA SSDK
+  DEPENDS:=@TARGET_ipq807x
 endef
-
 
 define Package/qca-ssdk-shell/Description
   This package contains a qca-ssdk shell application for QCA chipset
@@ -29,13 +28,14 @@ ifndef CONFIG_TOOLCHAIN_BIN_PATH
 CONFIG_TOOLCHAIN_BIN_PATH=$(TOOLCHAIN_DIR)/bin
 endif
 
-QCASSDK_CONFIG_OPTS+= TOOL_PATH=$(CONFIG_TOOLCHAIN_BIN_PATH) \
-                SYS_PATH=$(LINUX_DIR) \
-                TOOLPREFIX=$(TARGET_CROSS) \
-                KVER=$(LINUX_VERSION) \
-                CFLAGS="$(TARGET_CFLAGS)" \
-                LDFLAGS="$(TARGET_LDFLAGS)" \
-                ARCH=$(LINUX_KARCH)
+QCASSDK_CONFIG_OPTS+= \
+	ARCH=$(LINUX_KARCH) \
+	KVER=$(LINUX_VERSION) \
+	SYS_PATH=$(LINUX_DIR) \
+	CFLAGS="$(TARGET_CFLAGS)" \
+	LDFLAGS="$(TARGET_LDFLAGS)" \
+	TOOLPREFIX=$(TARGET_CROSS) \
+	TOOL_PATH=$(CONFIG_TOOLCHAIN_BIN_PATH)
 
 define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR) $(strip $(QCASSDK_CONFIG_OPTS))
@@ -45,6 +45,5 @@ define Package/qca-ssdk-shell/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/build/bin/ssdk_sh $(1)/usr/sbin/
 endef
-
 
 $(eval $(call BuildPackage,qca-ssdk-shell))
