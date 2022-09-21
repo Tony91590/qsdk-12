@@ -71,7 +71,7 @@ define Build/Compile
 		M="$(PKG_BUILD_DIR)" \
 		EXTRA_CFLAGS="$(EXTRA_CFLAGS)" \
 		NSS_CRYPTO_DIR=$(NSS_CRYPTO_DIR) \
-		SoC="$(subtarget)" \
+		SoC="$(BOARD)_64" \
 		modules
 endef
 
