@@ -41,6 +41,11 @@ endef
 define Build/InstallDev
 	mkdir -p $(1)/usr/include/qca-nss-drv
 	$(CP) $(PKG_BUILD_DIR)/exports/* $(1)/usr/include/qca-nss-drv/
+ifneq (, $(findstring $(BOARD)_64, "ipq807x" "ipq807x_64" "ipq60xx" "ipq60xx_64" "ipq50xx" "ipq50xx_64"))
+	$(RM) $(1)/usr/include/qca-nss-drv/nss_ipsecmgr.h
+	$(INSTALL_DIR) $(1)/usr/include/qca-nss-clients
+	$(CP) $(NSS_CLIENTS_DIR)/exports/nss_ipsecmgr.h $(1)/usr/include/qca-nss-clients/.
+endif
 endef
 
 EXTRA_CFLAGS+= -Wno-unused-variable \
