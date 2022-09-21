@@ -85,7 +85,7 @@ define Build/Compile
 		ARCH="$(LINUX_KARCH)" \
 		M="$(PKG_BUILD_DIR)" \
 		EXTRA_CFLAGS="$(EXTRA_CFLAGS)" \
-		SoC="$(subtarget)" \
+		SoC="$(BOARD)_64" \
 		modules
 endef
 
