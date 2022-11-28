@@ -8,7 +8,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=miniupnpd
-PKG_VERSION:=2.0.20170421
+PKG_VERSION:=2.2.0
 PKG_RELEASE:=6
 
 # Content-Encoding conflict, can refer to this [issue](https://github.com/miniupnp/miniupnp/issues/605)
