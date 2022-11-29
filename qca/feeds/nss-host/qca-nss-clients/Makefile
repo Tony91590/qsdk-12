@@ -17,7 +17,7 @@ define KernelPackage/qca-nss-drv-pppoe
   CATEGORY:=Kernel modules
   SUBMENU:=Network Devices
   TITLE:=Kernel driver for NSS PPPoE connection manager
-  DEPENDS:=@TARGET_ipq60xx +kmod-bonding +kmod-pppoe +kmod-qca-nss-drv
+  DEPENDS:=@TARGET_ipq60xx +kmod-bonding +kmod-pppoe +kmod-qca-nss-drv +kmod-mac80211
   FILES:=$(PKG_BUILD_DIR)/pppoe/qca-nss-pppoe.ko
   AUTOLOAD:=$(call AutoLoad,51,qca-nss-pppoe)
 endef
