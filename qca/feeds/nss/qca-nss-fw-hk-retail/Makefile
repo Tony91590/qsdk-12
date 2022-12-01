@@ -3,17 +3,17 @@ include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=qca-nss-fw-hk
 PKG_BRANCH:=nss
-PKG_VERSION:=020
+PKG_VERSION:=10
 PKG_RELEASE:=1
 PKG_MD5SUM:=skip
 
-NSS_VER:=12.0
+NSS_VER:=11.4
 NSS_SOC:=HK
 NSS_PROFILE:=R
 
-PKG_SOURCE:=BIN-NSS.FW.12.0.r1-002-HK.R.tar.bz2
-PKG_SOURCE_URL:=https://github.com/quic/qca-sdk-nss-fw/blob/main/QCA_Networking.SPF_11.5.0/CS/IPQ8074.ATH.11.5.0/BIN-NSS.FW.12.0.r1-002-HK.R.tar.bz2?raw=true
-PKG_BUILD_DIR:=$(BUILD_DIR)/BIN-NSS.FW.12.0.r1-002-HK.R
+PKG_SOURCE:=BIN-NSS.HK.11.4.0.5-5-R.tar.bz2
+PKG_SOURCE_URL:=https://github.com/quic/qca-sdk-nss-fw/blob/main/QCA_Networking_2021.SPF_11.4/CS/IPQ8074.ATH.11.4/BIN-NSS.HK.11.4.0.5-5-R.tar.bz2?raw=true
+PKG_BUILD_DIR:=$(BUILD_DIR)/BIN-NSS.HK.11.4.0.5-5-R
 
 include $(INCLUDE_DIR)/package.mk
 
