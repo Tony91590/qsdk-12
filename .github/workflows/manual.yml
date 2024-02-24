@@ -32,7 +32,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: Bb
 
@@ -47,7 +47,7 @@ jobs:
           sudo apt-get -y install ocaml-findlib ocaml-base-nox ocaml-base libfindlib-ocaml-dev autoconf automake ccache cgroupfs-mount gcc g++ binutils patch bzip2 flex make gettext pkg-config unzip zlib1g-dev libc6-dev subversion libncurses5-dev gawk sharutils curl libxml-parser-perl python-yaml ocaml-nox ocaml libssl-dev libfdt-dev device-tree-compiler u-boot-tools parallel freetds-dev ocaml-native-compilers libpcre-ocaml libpcre-ocaml-dev libpycaml-ocaml-dev coccinelle
           sudo apt-get -y install libssl1.0-dev
           sudo -E apt-get -y autoremove --purge
-          sudo -E apt-get clean
+  
 
           # sudo mkdir -p -m 777 /mnt/openwrt/bin /mnt/openwrt/build_dir/host /mnt/openwrt/build_dir/hostpkg /mnt/openwrt/dl /mnt/openwrt/feeds /mnt/openwrt/staging_dir
           # ln -s /mnt/openwrt/bin ./bin
@@ -67,7 +67,7 @@ jobs:
 
       - name: Generate configuration file
         run: |
-          wget https://raw.githubusercontent.com/Tony91590/qsdk-12/master/ax3600.config -O .config
+          wget https://raw.githubusercontent.com/Tony91590/qsdk-12/bb-carrer/ax3600.config -O .config
           make defconfig
 
       - name: Make download
@@ -98,26 +98,26 @@ jobs:
           cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/         
 
       - name: Deliver buildinfo
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: OpenWrt_buildinfo
           path: ./artifact/buildinfo/
 
       - name: Deliver package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: OpenWrt_package
           path: ./artifact/package/
 
       - name: Deliver firmware
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: OpenWrt_firmware
           path: ./bin/targets/
 
       - name: Upload release asset
         if: github.event == 'release'
-        uses: svenstaro/upload-release-action@v2
+        uses: svenstaro/upload-release-action@v3
         with:
           repo_token: ${{ secrets.YOURTOKEN }}
           file: ./artifact/firmware/*
